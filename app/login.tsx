@@ -125,7 +125,7 @@ export default function LoginScreen() {
         </Text>
 
         {/* Continue as guest */}
-        <TouchableOpacity onPress={() => router.push('/')}>
+        <TouchableOpacity onPress={() => router.push('/home')}>
           <Text style={styles.guestText}>Continue as Guest</Text>
         </TouchableOpacity>
       </View>
