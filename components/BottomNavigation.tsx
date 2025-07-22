@@ -1,14 +1,15 @@
 import React from "react"
-import { View, Text, TouchableOpacity, StyleSheet, Image, Dimensions } from "react-native"
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native"
 import { useNavigation, useRoute } from "@react-navigation/native"
+import { Ionicons } from '@expo/vector-icons'
 
 const navItems = [
-  { name: "Home", route: "Home", icon: require("../assets/home.png") },
-  { name: "Search", route: "Search", icon: require("../assets/search.png") },
-  { name: "Sell Car", route: "Sell", icon: require("../assets/plus.png") },
-  { name: "Favorites", route: "Favorites", icon: require("../assets/heart.png") },
-  { name: "Profile", route: "Profile", icon: require("../assets/user.png") },
-]
+  { name: "Home", route: "Home", icon: ({ color, size }: any) => <Ionicons name="home-outline" size={size} color={color} /> },
+  { name: "Search", route: "Search", icon: ({ color, size }: any) => <Ionicons name="search-outline" size={size} color={color} /> },
+  { name: "Sell Car", route: "Sell", icon: ({ color, size }: any) => <Ionicons name="car-outline" size={size} color={color} /> },
+  { name: "Favorites", route: "Favorites", icon: ({ color, size }: any) => <Ionicons name="heart-outline" size={size} color={color} /> },
+  { name: "Profile", route: "Profile", icon: ({ color, size }: any) => <Ionicons name="person-outline" size={size} color={color} /> },
+];
 
 export default function BottomNavigation() {
   const navigation = useNavigation()
@@ -21,18 +22,17 @@ export default function BottomNavigation() {
     <View style={styles.container}>
       {navItems.map(({ name, route: routeName, icon }) => {
         const active = isActive(routeName)
+        const iconColor = active ? "white" : "#8c9199"
+        const iconSize = 20
+
         return (
           <TouchableOpacity
             key={routeName}
             style={[styles.navItem, active && styles.activeNavItem]}
             onPress={() => navigation.navigate(routeName as never)}
           >
-            <Image
-              source={icon}
-              style={[styles.icon, active && styles.activeIcon]}
-              resizeMode="contain"
-            />
-            <Text style={[styles.label, active ? styles.activeLabel : null]}>{name}</Text>
+            {icon({ color: iconColor, size: iconSize })}
+            <Text style={[styles.label, active && styles.activeLabel]}>{name}</Text>
           </TouchableOpacity>
         )
       })}
@@ -69,14 +69,6 @@ const styles = StyleSheet.create({
   },
   activeNavItem: {
     backgroundColor: "#fc6828",
-  },
-  icon: {
-    width: 20,
-    height: 20,
-    tintColor: "#8c9199",
-  },
-  activeIcon: {
-    tintColor: "white",
   },
   label: {
     marginTop: 4,

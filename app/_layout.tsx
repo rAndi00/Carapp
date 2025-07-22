@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { AuthProvider } from './contexts/auth-context'; // <-- Add this import
+import { AuthProvider } from './contexts/auth-context'; // Make sure the path and casing matches your file
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -14,7 +14,7 @@ export default function RootLayout() {
   });
 
   if (!loaded) {
-    // Async font loading only occurs in development.
+    // Show nothing (or splash) while font loads
     return null;
   }
 
@@ -22,11 +22,10 @@ export default function RootLayout() {
     <AuthProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
-          {/* Main tabs */}
+          {/* Your main tabs */}
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          {/* Login screen */}
+          {/* Auth screens */}
           <Stack.Screen name="login" options={{ headerShown: false }} />
-          {/* Register screen */}
           <Stack.Screen name="register" options={{ headerShown: false }} />
           {/* Fallback screen */}
           <Stack.Screen name="+not-found" />

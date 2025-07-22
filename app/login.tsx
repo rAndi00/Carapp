@@ -1,5 +1,3 @@
-// app/login.tsx
-
 import React, { useState } from 'react';
 import {
   View,
@@ -12,16 +10,19 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons, Feather } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
+import { useAuth } from './contexts/auth-context'; // Adjust path if needed
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -46,11 +47,20 @@ export default function LoginScreen() {
     if (!validateForm()) return;
 
     setLoading(true);
-    // TODO: Connect to Laravel API here
-    setTimeout(() => {
+    setLoginError(null);
+
+    try {
+      const success = await login(email, password);
+      if (success) {
+        router.push('/'); // Navigate on success
+      } else {
+        setLoginError('Invalid email or password');
+      }
+    } catch (error) {
+      setLoginError('Login failed. Please try again.');
+    } finally {
       setLoading(false);
-      router.push('/'); // Change to your route
-    }, 1500);
+    }
   };
 
   return (
@@ -71,11 +81,7 @@ export default function LoginScreen() {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
-            style={[
-              styles.input,
-              errors.email ? styles.inputError : null,
-              { paddingLeft: 40 },
-            ]}
+            style={[styles.input, errors.email ? styles.inputError : null, { paddingLeft: 40 }]}
           />
         </View>
         {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
@@ -89,20 +95,16 @@ export default function LoginScreen() {
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
             autoCapitalize="none"
-            style={[
-              styles.input,
-              errors.password ? styles.inputError : null,
-              { paddingLeft: 40, paddingRight: 40 },
-            ]}
+            style={[styles.input, errors.password ? styles.inputError : null, { paddingLeft: 40, paddingRight: 40 }]}
           />
-          <TouchableOpacity
-            onPress={() => setShowPassword(!showPassword)}
-            style={styles.eyeIcon}
-          >
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
             <Feather name={showPassword ? 'eye-off' : 'eye'} size={20} color="#999" />
           </TouchableOpacity>
         </View>
         {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+
+        {/* Login error */}
+        {loginError && <Text style={styles.errorText}>{loginError}</Text>}
 
         {/* Forgot Password */}
         <TouchableOpacity onPress={() => router.push('/')}>
@@ -110,16 +112,8 @@ export default function LoginScreen() {
         </TouchableOpacity>
 
         {/* Button */}
-        <TouchableOpacity
-          onPress={handleLogin}
-          style={styles.button}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Sign In</Text>
-          )}
+        <TouchableOpacity onPress={handleLogin} style={styles.button} disabled={loading}>
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign In</Text>}
         </TouchableOpacity>
 
         {/* Sign up */}
@@ -138,6 +132,10 @@ export default function LoginScreen() {
     </KeyboardAvoidingView>
   );
 }
+
+// Your existing styles remain unchanged
+
+// Keep your styles as they are
 const styles = StyleSheet.create({
   container: {
     flex: 1,
